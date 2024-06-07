@@ -15,32 +15,56 @@ let message = document.querySelector('.message');  // Výběr elementu zobrazuj�
 let score_title = document.querySelector('.score_title');  // Výběr elementu zobrazujícího nadpis skóre
 
 let game_state = 'Start';  // Počáteční stav hry
+let is_paused = false;  // Stav pauzy hry
 img.style.display = 'none';  // Skrytí obrázku ptáčka na začátku
 message.classList.add('messageStyle');  // Přidání stylu k úvodní zprávě
 
-// Tato funkce naslouchá události stisknutí klávesy a kontroluje, zda byla stisknuta klávesa 'Enter'.
+// Tato funkce naslouchá události stisknutí klávesy a kontroluje, zda byla stisknuta klávesa 'Enter' nebo 'Escape'.
 // Pokud je hra v jiném stavu než 'Play', resetuje hru a připraví ji k novému spuštění.
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && game_state !== 'Play') {
-        // Odstraní všechny prvky s třídou 'pipe_sprite'
-        document.querySelectorAll('.pipe_sprite').forEach((el) => {
-            el.remove();
-        });
-        // Zobrazí obrázek ptáčka
-        img.style.display = 'block';
-        // Nastaví pozici ptáčka na 40vh (vertikální výška)
-        bird.style.top = '40vh';
-        // Změní stav hry na 'Play'
-        game_state = 'Play';
-        // Vymaže zprávu a aktualizuje skóre
-        message.innerHTML = '';
-        score_title.textContent = 'Skóre : ';
-        score_val.textContent = '0';
-        message.classList.remove('messageStyle');
-        // Spustí funkci play()
-        play();
+    if (e.key === 'Enter') {
+        if (game_state === 'Start' || game_state === 'End') {
+            // Odstraní všechny prvky s třídou 'pipe_sprite'
+            document.querySelectorAll('.pipe_sprite').forEach((el) => {
+                el.remove();
+            });
+            // Zobrazí obrázek ptáčka
+            img.style.display = 'block';
+            // Nastaví pozici ptáčka na 40vh (vertikální výška)
+            bird.style.top = '40vh';
+            // Změní stav hry na 'Play'
+            game_state = 'Play';
+            // Vymaže zprávu a aktualizuje skóre
+            message.innerHTML = '';
+            score_title.textContent = 'Skóre : ';
+            score_val.textContent = '0';
+            message.classList.remove('messageStyle');
+            // Spustí funkci play()
+            play();
+        } else if (game_state === 'Paused') {
+            // Pokud je hra v pauze, pokračuje ve hře
+            game_state = 'Play';
+            message.innerHTML = '';
+            message.classList.remove('messageStyle');
+            play();
+        }
+    } else if (e.key === 'Escape' && game_state === 'Play') {
+        // Pokud je hra v režimu 'Play', přepne na režim 'Paused'
+        togglePause();
     }
 });
+
+// Funkce pro přepnutí stavu pauzy
+function togglePause() {
+    if (game_state === 'Play') {
+        is_paused = !is_paused;
+        if (is_paused) {
+            game_state = 'Paused';
+            message.innerHTML = 'Hra pozastavena'.fontcolor('yellow') + '<br>Stiskni enter pro pokračování';
+            message.classList.add('messageStyle');
+        }
+    }
+}
 
 function play() {
     // Funkce move zajišťuje pohyb potrubí a kontroluje kolize mezi ptáčkem a potrubím.
@@ -99,7 +123,7 @@ function play() {
             }
         });
 
-        // Naslouchá uvolnění klávesy 'ArrowUp' nebo mezerníku a změní obrázek ptáčka zpět.
+        // Naslouchá uvolnění klávesy 'ArrowUp' nebo mezerníku
         document.addEventListener('keyup', (e) => {
             if (e.key === 'ArrowUp' || e.key === ' ') {
                 img.src = 'images/Bird.png';
