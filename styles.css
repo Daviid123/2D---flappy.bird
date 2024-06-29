@@ -10,7 +10,7 @@
 .background {
 	height: 100vh;
 	width: 100vw;
-	background: url('images/background-img.png') no-repeat center center fixed;
+	background: url('images/background-image.jpg') no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -32,7 +32,7 @@
 	position: fixed;
 	top: 40vh;
 	left: 100vw;
-	height: 70vh;
+	height: 60vh;
 	width: 6vw;
 	background: radial-gradient(lightgreen 50%, green);
 	border: 5px solid black;
@@ -42,7 +42,7 @@
 .message {
 	position: absolute;
 	z-index: 10;
-	color: black;
+	color: rgb(250, 245, 245);
 	top: 30%;
 	left: 50%;
 	font-size: 4em;
@@ -91,10 +91,72 @@
 		font-size: 8vh;
 	}
 	.bird{
-		width: 120px;
-		height: 90px;
+		width: 100px;
+		height: 75px;
 	}
 	.pipe_sprite{
 		width: 14vw;
 	}
+}
+.lives {
+    position: fixed;
+	z-index: 10;
+    top: 15px;
+    right: 10px;
+    display: flex;
+    flex-direction: row-reverse;  /* Obrátí pořadí srdíček, aby se odebírala zprava */
+}
+
+.heart {
+	font-size: 55px;
+    margin-left: 5px;
+}
+/* Styl pro tabulku */
+.score-board {
+    position: fixed;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 35px; /* Zvětšený padding */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(214, 194, 194, 0.2);
+    display: none;  /* Skrytí tabulky */
+    text-align: center;
+    z-index: 11;  /* Nad ostatními prvky */
+}
+
+.score-board h2 {
+    margin-bottom: 20px;
+    font-size: 3em; 
+}
+
+.score-board p {
+    font-size: 2em; 
+    margin: 20px 0;
+}
+.heart_sprite {
+    position: fixed;
+    font-size: 40px;
+    z-index: 100;
+}
+.timer {
+	position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 34px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+    z-index: 10;
+}
+@keyframes heartBlink {
+    0%, 24%, 49%, 74%, 100% { opacity: 1; }
+    12%, 37%, 62%, 87% { opacity: 0; }
+}
+
+.heart-blink {
+    animation: heartBlink 2s ease-in-out;
 }
