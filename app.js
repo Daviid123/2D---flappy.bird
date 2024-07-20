@@ -1,4 +1,4 @@
-let move_speed = 5, gravity = 0.5; // Nastavení rychlosti pohybu a gravitace
+let move_speed = 6, gravity = 0.5; // Nastavení rychlosti pohybu a gravitace
 let bird = document.querySelector('.bird'); // Výběr prvku ptáčka
 let img = document.getElementById('bird-1'); // Výběr obrázku ptáčka
 let bird_props = bird.getBoundingClientRect(); // Získání pozice a velikosti ptáčka
@@ -8,8 +8,9 @@ let message = document.querySelector('.message'); // Výběr prvku pro zprávy
 let score_title = document.querySelector('.score_title'); // Výběr prvku pro název skóre
 let startTime;
 let timerInterval;
-let lastChickenTime = 0;
-const minChickenInterval = 5000;
+let lastZajicTime = 0;
+const minZajicInterval = 5000;
+let originalMoveSpeed = move_speed;
 
 function updateTimer() {
     // Získání aktuálního času v milisekundách
@@ -72,7 +73,6 @@ let isPaused = false; // Stav pozastavení hry
 document.addEventListener('keydown', (e) => {
     // Funkce, která se spustí při stisknutí klávesy
     if (e.key === 'Enter' && game_state !== 'Play' && !isPaused) {
-        // Pokud je stisknut Enter a hra není v režimu "Play" a není pozastavena
 
         document.querySelectorAll('.pipe_sprite').forEach((e) => {
             // Odstraní všechny prvky s třídou 'pipe_sprite'
@@ -84,12 +84,12 @@ document.addEventListener('keydown', (e) => {
                 heart.style.display = 'inline'; // Zobrazí všechny životy
             });
         });
-        img.style.display = 'block'; // Zobrazí obrázek ptáčka
-        bird.style.top = '40vh'; // Nastaví pozici ptáčka na 40vh
-        game_state = 'Play'; // Změní stav hry na "Play"
-        message.innerHTML = ''; // Vymaže zprávu
-        score_title.innerHTML = 'Skóre : '; // Nastaví název skóre
-        score_val.innerHTML = '0'; // Nastaví hodnotu skóre na 0
+        img.style.display = 'block';
+        bird.style.top = '40vh';
+        game_state = 'Play';
+        message.innerHTML = '';
+        score_title.innerHTML = 'Skóre : ';
+        score_val.innerHTML = '0';
         
         document.querySelectorAll('.heart').forEach(heart => {
             heart.style.display = 'inline'; // Zobrazí všechny životy
@@ -98,15 +98,15 @@ document.addEventListener('keydown', (e) => {
         play(); // Spustí hru
     }
     if (e.key === 'Escape' && game_state === 'Play') {
-        // Pokud je stisknut Escape a hra je v režimu "Play"
-        togglePause(); // Přepne stav hry mezi "Pozastaveno" a "Play"
+        togglePause();
     }
 });
 
 function play() {
     // Funkce, která řídí hlavní smyčku hry
     createPipe();
-    createChicken();
+    createZajic();
+    createIceCube();
     move();
     if (heart_separation >= Math.floor(Math.random() * (max_heart_separation - min_heart_separation + 1)) + min_heart_separation) {
         heart_separation = 0;
@@ -121,8 +121,9 @@ function play() {
         if (game_state !== 'Play' || isPaused) return;
     
         let pipe_sprites = document.querySelectorAll('.pipe_sprite');
-        let chicken_sprites = document.querySelectorAll('.chicken_sprite');
-    
+        let zajic_sprites = document.querySelectorAll('.zajic_sprite');
+        let ice_cube_sprites = document.querySelectorAll('.ice_cube_sprite');
+        
         pipe_sprites.forEach((element) => {
             let pipe_sprite_props = element.getBoundingClientRect();
             bird_props = bird.getBoundingClientRect();
@@ -152,27 +153,62 @@ function play() {
             }
         });
     
-        chicken_sprites.forEach((element) => {
-            let chicken_sprite_props = element.getBoundingClientRect();
+        zajic_sprites.forEach((element) => {
+            let zajic_sprite_props = element.getBoundingClientRect();
             bird_props = bird.getBoundingClientRect();
-        
-            if (chicken_sprite_props.right <= 0) {
+    
+            if (zajic_sprite_props.right <= 0) {
                 element.remove();
-            } else if (
-                bird_props.left < chicken_sprite_props.left + chicken_sprite_props.width &&
-                bird_props.left + bird_props.width > chicken_sprite_props.left &&
-                bird_props.top < chicken_sprite_props.top + chicken_sprite_props.height &&
-                bird_props.top + bird_props.height > chicken_sprite_props.top
-            ) {
-                element.remove();
-                addLife();
             } else {
-                element.style.left = chicken_sprite_props.left - move_speed + 'px';
+                if (
+                    bird_props.left < zajic_sprite_props.left + zajic_sprite_props.width &&
+                    bird_props.left + bird_props.width > zajic_sprite_props.left &&
+                    bird_props.top < zajic_sprite_props.top + zajic_sprite_props.height &&
+                    bird_props.top + bird_props.height > zajic_sprite_props.top
+                ) {
+                    element.remove();
+                    addLife();
+                } else {
+                    element.style.left = zajic_sprite_props.left - move_speed + 'px';
+                }
+            }
+        });
+
+        ice_cube_sprites.forEach((element) => {
+            let ice_cube_sprite_props = element.getBoundingClientRect();
+            bird_props = bird.getBoundingClientRect();
+    
+            if (ice_cube_sprite_props.right <= 0) {
+                element.remove();
+            } else {
+                if (
+                    bird_props.left < ice_cube_sprite_props.left + ice_cube_sprite_props.width &&
+                    bird_props.left + bird_props.width > ice_cube_sprite_props.left &&
+                    bird_props.top < ice_cube_sprite_props.top + ice_cube_sprite_props.height &&
+                    bird_props.top + bird_props.height > ice_cube_sprite_props.top
+                ) {
+                    element.remove();
+                    slowDownGame();
+                } else {
+                    element.style.left = ice_cube_sprite_props.left - move_speed + 'px';
+                }
             }
         });
     
         requestAnimationFrame(move);
     }
+
+    let originalMoveSpeed = move_speed;
+    let slowDownTimer;
+
+    function slowDownGame() {
+        move_speed = originalMoveSpeed / 2; // Zpomalíme hru na polovinu
+        clearTimeout(slowDownTimer);
+        slowDownTimer = setTimeout(() => {
+            move_speed = originalMoveSpeed; // Vrátíme původní rychlost po 5 sekundách
+        }, 5000);
+    }
+
     let bird_dy = 0;
     function applyGravity() {
         // Funkce, která aplikuje gravitaci na ptáčka
@@ -201,10 +237,12 @@ function play() {
         }
     }
 
-    document.addEventListener('keydown', handleJump); // Přidá událost pro skok
+    document.addEventListener('keydown', handleJump);
 
     createPipe(); // Vytvoření překážky
 }
+
+let originalPipeSeparation = 115
 let pipe_separation = 0;
 let pipe_gap = 40;
 const min_pipe_separation = 200; // Minimální mezera mezi překážkami
@@ -213,7 +251,10 @@ const max_pipe_separation = 300; // Maximální mezera mezi překážkami
 function createPipe() {
     if (game_state !== 'Play' || isPaused) return;
 
-    if (pipe_separation > 115) {
+    // Vypočítáme aktuální mezeru mezi překážkami na základě aktuální rychlosti
+    let currentPipeSeparation = originalPipeSeparation * (originalMoveSpeed / move_speed);
+
+    if (pipe_separation > currentPipeSeparation) {
         pipe_separation = 0;
 
         let pipe_posi = Math.floor(Math.random() * 43) + 8;
@@ -233,12 +274,14 @@ function createPipe() {
 
         console.log('Pipes created');
 
-        // Zde voláme createChicken s určitou pravděpodobností
-        if (Math.random() < 0.15 && Date.now() - lastChickenTime > minChickenInterval) { // 15% šance na vytvoření kuřete
+        if (Math.random() < 0.15 && Date.now() - lastZajicTime > minZajicInterval) {
             setTimeout(() => {
-                createChicken();
-                lastChickenTime = Date.now();
+                createZajic();
+                lastZajicTime = Date.now();
             }, 500);
+        }
+        if (Math.random() < 0.5) {
+            setTimeout(createIceCube, 500);
         }
     }
     pipe_separation++;
@@ -250,7 +293,6 @@ function handleCollision() {
     const visibleHearts = Array.from(hearts).filter(heart => heart.style.display !== 'none');
     
     if (visibleHearts.length > 0) {
-        // Přidáme třídu pro blikání všem viditelným srdíčkům
         visibleHearts.forEach(heart => {
             heart.classList.add('heart-blink');
         });
@@ -280,7 +322,6 @@ function handleCollision() {
         let topPipe = pipes[0];
         let bottomPipe = pipes[1];
         
-        // Vypočítáme střed mezi překážkami
         let topPipeBottom = topPipe.getBoundingClientRect().bottom;
         let bottomPipeTop = bottomPipe.getBoundingClientRect().top;
         let middleY = (topPipeBottom + bottomPipeTop) / 2;
@@ -288,7 +329,6 @@ function handleCollision() {
         // Umístíme ptáčka do středu
         bird.style.top = middleY - bird.offsetHeight / 2 + 'px';
     } else {
-        // Pokud nejsou viditelné překážky, umístíme ptáčka doprostřed obrazovky
         bird.style.top = '40vh';
     }
     
@@ -296,7 +336,7 @@ function handleCollision() {
 
     setTimeout(() => {
         isInvincible = false;
-    }, 1500); // Prodloužíme dobu nezranitelnosti, aby pokryla celou animaci a ještě chvíli navíc
+    }, 1500);
 }
 
 function updateLives() {
@@ -343,7 +383,6 @@ function hideScoreBoard() {
 }
 
 function togglePause() {
-    // Funkce, která přepíná stav hry mezi "Pozastaveno" a "Play"
     isPaused = !isPaused;
     if (isPaused) {
         message.innerHTML = 'Hra pozastavena<br>Stiskni Escape pro pokračování'; // Zobrazí zprávu o pozastavení
@@ -354,13 +393,11 @@ function togglePause() {
 }
 
 document.addEventListener('keydown', (e) => {
-    // Funkce, která zpracovává restart hry při stisknutí Enteru
     if (e.key === 'Enter' && game_state === 'End') {
         console.log('Restarting game...');
         hideScoreBoard(); // Skryje tabulku skóre při restartu hry
     }
 
-    // Funkce, která zpracovává opětovné spuštění hry při stisknutí Enteru, pokud je hra pozastavena
     if (e.key === 'Enter' && game_state !== 'Play' && isPaused) {
         document.querySelectorAll('.pipe_sprite').forEach((e) => {
             e.remove();
@@ -371,12 +408,12 @@ document.addEventListener('keydown', (e) => {
                 heart.style.display = 'inline'; // Zobrazí všechny životy
             });
         });
-        img.style.display = 'block'; // Zobrazí obrázek ptáčka
-        bird.style.top = '40vh'; // Nastaví pozici ptáčka na 40vh
-        game_state = 'Play'; // Změní stav hry na "Play"
-        message.innerHTML = ''; // Vymaže zprávu
-        score_title.innerHTML = 'Skóre : '; // Nastaví název skóre
-        score_val.innerHTML = '0'; // Nastaví hodnotu skóre na 0
+        img.style.display = 'block';
+        bird.style.top = '40vh';
+        game_state = 'Play';
+        message.innerHTML = '';
+        score_title.innerHTML = 'Skóre : ';
+        score_val.innerHTML = '0';
         
         document.querySelectorAll('.heart').forEach(heart => {
             heart.style.display = 'inline'; // Zobrazí všechny životy
@@ -385,25 +422,19 @@ document.addEventListener('keydown', (e) => {
         play(); // Spustí hru
     }
 
-    // Funkce, která zpracovává pozastavení hry při stisknutí Escape
     if (e.key === 'Escape') {
-        togglePause(); // Přepne stav hry mezi "Pozastaveno" a "Play"
+        togglePause();
     }
 });
 
 let heart_separation = 0;
-const min_heart_separation = 5; // Minimální počet překážek mezi srdíčky
-const max_heart_separation = 10; // Maximální počet překážek mezi srdíčky
+const min_heart_separation = 5; // Minimální počet překážek mezi zajíci
+const max_heart_separation = 10; // Maximální počet překážek mezi zajíci
 
-function createChicken() {
-    console.log('Attempting to create chicken');
-    if (game_state !== 'Play' || isPaused) {
-        console.log('Game not in play state or paused, chicken not created');
-        return;
-    }
+function createZajic() {
+    if (game_state !== 'Play' || isPaused) return;
 
     let pipe_sprites = document.querySelectorAll('.pipe_sprite');
-    console.log('Number of pipe sprites:', pipe_sprites.length);
     if (pipe_sprites.length >= 2) {
         let topPipe = pipe_sprites[pipe_sprites.length - 2];
         let bottomPipe = pipe_sprites[pipe_sprites.length - 1];
@@ -411,22 +442,56 @@ function createChicken() {
         let topPipeRect = topPipe.getBoundingClientRect();
         let bottomPipeRect = bottomPipe.getBoundingClientRect();
         
-        let chickenY = topPipeRect.bottom + (bottomPipeRect.top - topPipeRect.bottom) / 2 - 25;
-        let chickenX = topPipeRect.right + (window.innerWidth - topPipeRect.right) / 2 - 25;
+        // Výpočet vertikální pozice zajíce
+        let minY = topPipeRect.bottom + 10; // 10px pod horní překážkou
+        let maxY = bottomPipeRect.top - 70 - 10; // 10px nad dolní překážkou (70px je výška zajíce)
+        let zajicY = Math.random() * (maxY - minY) + minY;
         
-        let chicken_sprite = document.createElement('img');
-        chicken_sprite.src = 'images/chicken.png';
-        chicken_sprite.className = 'chicken_sprite';
-        chicken_sprite.style.top = chickenY + 'px';
-        chicken_sprite.style.left = chickenX + 'px';
-        document.body.appendChild(chicken_sprite);
+        // Horizontální pozice zajíce - těsně za pravým okrajem obrazovky
+        let zajicX = window.innerWidth;
         
-        console.log('Chicken created at X:', chickenX, 'Y:', chickenY);
-    } else {
-        console.log('Not enough pipe sprites to create chicken');
+        let zajic_sprite = document.createElement('img');
+        zajic_sprite.src = 'images/zajic.png';
+        zajic_sprite.className = 'zajic_sprite';
+        zajic_sprite.style.top = zajicY + 'px';
+        zajic_sprite.style.left = zajicX + 'px';
+        document.body.appendChild(zajic_sprite);
+        
+        console.log('Zajic created at X:', zajicX, 'Y:', zajicY);
+    }
+}
+
+lastIceCubeTime = 0;
+const minIceCubeInterval = 7000; // Minimální interval mezi ledovými kostkami (7 sekund)
+
+function createIceCube() {
+    if (game_state !== 'Play' || isPaused) return;
+
+    let pipe_sprites = document.querySelectorAll('.pipe_sprite');
+    if (pipe_sprites.length >= 2 && Date.now() - lastIceCubeTime > minIceCubeInterval) {
+        let topPipe = pipe_sprites[pipe_sprites.length - 2];
+        let bottomPipe = pipe_sprites[pipe_sprites.length - 1];
+        
+        let topPipeRect = topPipe.getBoundingClientRect();
+        let bottomPipeRect = bottomPipe.getBoundingClientRect();
+        
+        let minY = topPipeRect.bottom + 10;
+        let maxY = bottomPipeRect.top - 70 - 10; // 70px je výška ledové kostky
+        let iceCubeY = Math.random() * (maxY - minY) + minY;
+        
+        let iceCubeX = window.innerWidth;
+        
+        let ice_cube_sprite = document.createElement('img');
+        ice_cube_sprite.src = 'images/ice_cube.png'; // Ujistěte se, že máte tento obrázek
+        ice_cube_sprite.className = 'ice_cube_sprite';
+        ice_cube_sprite.style.top = iceCubeY + 'px';
+        ice_cube_sprite.style.left = iceCubeX + 'px';
+        document.body.appendChild(ice_cube_sprite);
+        
+        lastIceCubeTime = Date.now();
     }
 }
 
 
 // Inicializace hry
-message.innerHTML = 'Stiskni Enter pro start hry'; // Zobrazení úvodní zprávy
+message.innerHTML = '<span class="start-message">Stiskni Enter pro start hry</span>';

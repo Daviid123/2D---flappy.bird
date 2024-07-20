@@ -10,7 +10,7 @@
 .background {
 	height: 100vh;
 	width: 100vw;
-	background: url('images/background-image.jpg') no-repeat center center fixed;
+	background: url('images/background-forest.png') no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -19,8 +19,8 @@
 
 /* Styl pro ptáčka */
 .bird {
-	height: 110px;
-	width: 140px;
+	height: 90px;
+	width: 120px;
 	position: fixed;
 	top: 40vh;
 	left: 30vw;
@@ -34,7 +34,7 @@
     left: 100vw;
     height: 60vh;
     width: 6vw;
-    background: radial-gradient(lightgreen 50%, green);
+    background: radial-gradient(rgb(11, 175, 197) 50%, rgb(16, 43, 199));
     border: 5px solid black;
 }
 
@@ -91,8 +91,8 @@
 		font-size: 8vh;
 	}
 	.bird{
-		width: 100px;
-		height: 75px;
+		width: 80px;
+		height: 60px;
 	}
 	.pipe_sprite{
 		width: 14vw;
@@ -114,32 +114,54 @@
 /* Styl pro tabulku */
 .score-board {
     position: fixed;
-    top: 55%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 40px; /* Zvětšený padding */
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(214, 194, 194, 0.2);
-    display: none;  /* Skrytí tabulky */
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 30px 50px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    display: none;
     text-align: center;
-    z-index: 11;  /* Nad ostatními prvky */
+    z-index: 11;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    max-width: 90%;
+    width: 400px;
 }
 
 .score-board h2 {
-    margin-bottom: 20px;
-    font-size: 3em; /* Zvětšená velikost písma */
+    margin-bottom: 25px;
+    font-size: 2.5em;
+    color: #2c3e50;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
 .score-board p {
-    font-size: 2em; /* Zvětšená velikost písma */
-    margin: 20px 0; /* Zvětšený margin */
+    font-size: 1.5em;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
 }
-.chicken_sprite {
+
+.score-board p:hover {
+    background-color: #e0e0e0;
+}
+
+#current-score, #best-score {
+    font-weight: bold;
+    color: #e74c3c;
+    font-size: 1.2em;
+}
+
+.zajic_sprite {
     position: fixed;
     z-index: 99;
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
 }
 .timer {
 	position: fixed;
@@ -160,4 +182,65 @@
 
 .heart-blink {
     animation: heartBlink 2s ease-in-out;
+}
+
+@media only screen and (max-width: 600px) {
+    .score-board {
+        padding: 20px 30px;
+        width: 90%;
+    }
+
+    .score-board h2 {
+        font-size: 2em;
+    }
+
+    .score-board p {
+        font-size: 1.2em;
+    }
+}
+/* styly pro začáteční zprávu */
+.start-message {
+    display: inline-block;
+    font-size: 1.5em; 
+    font-weight: bold;
+    color: #ffffff;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;  
+    border-radius: 25px;  
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);  
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); 
+    transition: all 0.3s ease;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.03);  
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.start-message:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);  
+    transform: scale(1.05);  
+}
+
+@media only screen and (max-width: 600px) {
+    .start-message {
+        font-size: 1.2em;  
+        padding: 8px 16px;  
+    }
+}
+
+.ice_cube_sprite {
+    position: fixed;
+    z-index: 99;
+    width: 70px;
+    height: 70px;
 }
