@@ -13,16 +13,10 @@ const minZajicInterval = 5000;
 let originalMoveSpeed = move_speed;
 
 function updateTimer() {
-    // Získání aktuálního času v milisekundách
     const currentTime = new Date().getTime();
-
-    // Výpočet uplynulého času od startTime do currentTime
     const elapsedTime = new Date(currentTime - startTime);
-
-    // Získání minut a sekund z uplynulého času a jejich formátování
     const minutes = elapsedTime.getMinutes().toString().padStart(2, '0');
     const seconds = elapsedTime.getSeconds().toString().padStart(2, '0');
-
     // Aktualizace textu časovače na stránce s minutami a sekundami
     document.getElementById('timer').textContent = `${minutes}:${seconds}`;
 }
@@ -65,10 +59,10 @@ function getLives() {
     return document.querySelectorAll('.heart').length;
 }
 
-let game_state = 'Start'; // Počáteční stav hry
-let isInvincible = false; // Zda je ptáček nezranitelný
-let bird_dy = 0; // Vertikální rychlost ptáčka
-let isPaused = false; // Stav pozastavení hry
+let game_state = 'Start';
+let isInvincible = false;
+let bird_dy = 0;
+let isPaused = false;
 
 document.addEventListener('keydown', (e) => {
     // Funkce, která se spustí při stisknutí klávesy
@@ -202,10 +196,10 @@ function play() {
     let slowDownTimer;
 
     function slowDownGame() {
-        move_speed = originalMoveSpeed / 2; // Zpomalíme hru na polovinu
+        move_speed = originalMoveSpeed / 2; // Zpomalí hru na polovinu
         clearTimeout(slowDownTimer);
         slowDownTimer = setTimeout(() => {
-            move_speed = originalMoveSpeed; // Vrátíme původní rychlost po 5 sekundách
+            move_speed = originalMoveSpeed; // Vrátím původní rychlost po 5 sekundách
         }, 5000);
     }
 
@@ -222,8 +216,8 @@ function play() {
             message.style.left = '28vw';
             return;
         }
-        bird.style.top = bird_props.top + bird_dy + 'px'; // Aplikuje gravitaci na ptáčka
-        bird_props = bird.getBoundingClientRect(); // Aktualizuje pozici a velikost ptáčka
+        bird.style.top = bird_props.top + bird_dy + 'px';
+        bird_props = bird.getBoundingClientRect();
         requestAnimationFrame(applyGravity); // Pokračování animace
     }
     requestAnimationFrame(applyGravity);
@@ -251,7 +245,7 @@ const max_pipe_separation = 300; // Maximální mezera mezi překážkami
 function createPipe() {
     if (game_state !== 'Play' || isPaused) return;
 
-    // Vypočítáme aktuální mezeru mezi překážkami na základě aktuální rychlosti
+    // Vypočítá aktuální mezeru mezi překážkami na základě aktuální rychlosti
     let currentPipeSeparation = originalPipeSeparation * (originalMoveSpeed / move_speed);
 
     if (pipe_separation > currentPipeSeparation) {
@@ -326,13 +320,13 @@ function handleCollision() {
         let bottomPipeTop = bottomPipe.getBoundingClientRect().top;
         let middleY = (topPipeBottom + bottomPipeTop) / 2;
         
-        // Umístíme ptáčka do středu
+        // Umístí ptáčka do středu
         bird.style.top = middleY - bird.offsetHeight / 2 + 'px';
     } else {
         bird.style.top = '40vh';
     }
     
-    bird_dy = 0; // Zastavíme vertikální pohyb ptáčka
+    bird_dy = 0; // Zastaví vertikální pohyb ptáčka
 
     setTimeout(() => {
         isInvincible = false;
@@ -447,7 +441,7 @@ function createZajic() {
         let maxY = bottomPipeRect.top - 70 - 10; // 10px nad dolní překážkou (70px je výška zajíce)
         let zajicY = Math.random() * (maxY - minY) + minY;
         
-        // Horizontální pozice zajíce - těsně za pravým okrajem obrazovky
+        // Horizontální pozice zajíce
         let zajicX = window.innerWidth;
         
         let zajic_sprite = document.createElement('img');
@@ -482,7 +476,7 @@ function createIceCube() {
         let iceCubeX = window.innerWidth;
         
         let ice_cube_sprite = document.createElement('img');
-        ice_cube_sprite.src = 'images/ice_cube.png'; // Ujistěte se, že máte tento obrázek
+        ice_cube_sprite.src = 'images/ice_cube.png';
         ice_cube_sprite.className = 'ice_cube_sprite';
         ice_cube_sprite.style.top = iceCubeY + 'px';
         ice_cube_sprite.style.left = iceCubeX + 'px';
